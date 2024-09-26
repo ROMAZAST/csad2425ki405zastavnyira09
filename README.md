@@ -21,4 +21,4 @@ Let me know if you need any more changes!
 ## Technology and Hardware
 - Hardware: Arduino
 - Software: Windows Forms App
-- Programming language:C#
+- Programming language: C#
