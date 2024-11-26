@@ -37,7 +37,7 @@ jobs:
         run: ci/run.bat
         
       - name: Run tests
-        run: dotnet test client/Tic_Tac_Toe_Client.sln --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
+        run: dotnet test client/Tic_Tac_Toe_Client.sln --configuration Release --verbosity normal --logger "trx;LogFileName=test_results.trx"
       
       - name: Publish test reports as artifacts
         if: success()
