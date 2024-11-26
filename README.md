@@ -49,3 +49,13 @@ Let me know if you need any more changes!
 4. **Build the Project:**
    - Click on **Build** in the top menu.
    - Select **Build Solution** (or simply press **Ctrl + Shift + B**).
+
+# Task 3: Implement Server (HW) and Client (SW) parts of the game (FEF)
+
+## Client (SW) using Windows Forms:
+The client is implemented as a **Windows Forms** application, where players can interact with the game by submitting their moves. The application provides a user-friendly interface with buttons, textboxes, or other controls to input data, view the game status, and interact with the server.
+
+## Server (HW) on Arduino:
+The server is implemented on an **Arduino** device, which listens for requests from the client (Windows Forms). The server is responsible for:
+- **Processing Game Logic**: Validating the player's moves, updating the game state, and determining the winner.
+- **Communicating with the Client**: Receiving moves from the client, performing the necessary calculations, and sending updates back to the client.

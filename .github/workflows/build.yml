@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - develop
-      - feature/develop/task2
+      - feature/develop/task3
   pull_request:
     branches:
       - develop
@@ -16,24 +16,32 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+      
+      - name: Download Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+        with:
+          version: '1.0.1'
+
+      - name: Download platform Arduino AVR
+        run: arduino-cli core install arduino:avr
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.403
           
       - name: Restore dependencies
-        run: dotnet restore
-        
+        run: dotnet restore client/Tic_Tac_Toe_Client.sln
+
       - name: Build solution
-        run: dotnet build Tic_Tac_Toe_Client.sln --configuration Release --property:Platform="x86"
+        run: ci/run.bat
         
       - name: Run tests
-        run: dotnet test Tic_Tac_Toe_Client.sln --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
+        run: dotnet test client/Tic_Tac_Toe_Client.sln --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx"
       
       - name: Publish test reports as artifacts
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-reports
           path: ./TestResults/test_results.trx
@@ -41,7 +49,7 @@ jobs:
 
       - name: Publish build artifacts
         if: success()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: Tic_Tac_Toe_Client/bin/x86/Release/
