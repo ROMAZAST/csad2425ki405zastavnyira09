@@ -1,3 +1,5 @@
+# Task 1: Initiate GIT repository
+
 ## Repository Details
 This repository contains a project for a Tic-Tac-Toe game created using Arduino for the CSAD course.
 
@@ -59,3 +61,17 @@ The client is implemented as a **Windows Forms** application, where players can 
 The server is implemented on an **Arduino** device, which listens for requests from the client (Windows Forms). The server is responsible for:
 - **Processing Game Logic**: Validating the player's moves, updating the game state, and determining the winner.
 - **Communicating with the Client**: Receiving moves from the client, performing the necessary calculations, and sending updates back to the client.
+
+# Task 4: Doxygen Documentation
+
+This task involves adding Doxygen comments to the code and generating documentation based on those comments.
+
+## What Was Done
+
+### 1. Added Doxygen Comments
+- All public functions, variables, and fields were documented using Doxygen comments.
+
+### 2. Configured Doxygen
+- A `Doxyfile` was generated using `doxygen -g` for configuration.
+- The file was set to document `.cs` and `.ino` files, and output was directed to the `./docs` folder.
+
