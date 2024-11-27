@@ -41,6 +41,7 @@ if not exist "%CLIENT_PATH%\Tic_Tac_Toe_Client\Tic_Tac_Toe_Client.csproj" (
 )
 
 dotnet build "%CLIENT_PATH%\Tic_Tac_Toe_Client\Tic_Tac_Toe_Client.csproj" --configuration Release /p:Platform="x86" --output "%BUILD_DIR%"
+dotnet build "%CLIENT_PATH%\Tic_Tac_Toe_Client\Tic_Tac_Toe_Client.csproj" --configuration Release /p:Platform="x86" 
 if %errorlevel% neq 0 (
     echo [FAIL] Compilation of the client application failed.
     pause

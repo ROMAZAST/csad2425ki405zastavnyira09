@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - develop
-      - feature/develop/task3
+      - feature/develop/task4
   pull_request:
     branches:
       - develop
@@ -34,7 +34,7 @@ jobs:
         run: dotnet restore client/Tic_Tac_Toe_Client.sln
 
       - name: Build solution
-        run: ci/run.bat
+        run: ci/Build.bat
         
       - name: Run tests
         run: dotnet test client/Tic_Tac_Toe_Client.sln --configuration Release --verbosity normal --logger "trx;LogFileName=test_results.trx"
@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-reports
-          path: ./TestResults/test_results.trx
+          path: client\TicTacToeTests\TestResults\test_results.trx
           if-no-files-found: ignore
 
       - name: Publish build artifacts
@@ -52,5 +52,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: Tic_Tac_Toe_Client/bin/x86/Release/
+          path: client/Tic_Tac_Toe_Client/bin/x86/Release/
           if-no-files-found: ignore
