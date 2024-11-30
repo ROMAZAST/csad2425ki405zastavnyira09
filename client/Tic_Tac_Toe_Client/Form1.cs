@@ -167,8 +167,6 @@ namespace Tic_Tac_Toe_Client
             }
         }
 
-
-
         /// <summary>
         /// Handles the "Load" action from the menu to load the game state from Arduino.
         /// </summary>
@@ -250,7 +248,6 @@ namespace Tic_Tac_Toe_Client
             }
         }
 
-
         /// <summary>
         /// Initializes the game with the specified mode, label texts, and starting move.
         /// </summary>
@@ -303,7 +300,6 @@ namespace Tic_Tac_Toe_Client
             button8.Text = string.Empty;  // Clear text on button 8
             button9.Text = string.Empty;  // Clear text on button 9
         }
-
 
         /// <summary>
         /// Reads the response from Arduino after sending a message.
