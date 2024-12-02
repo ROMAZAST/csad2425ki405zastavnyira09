@@ -1,151 +1,167 @@
-using Moq;
 using System.IO.Ports;
-
-// Interface to abstract serial port communication
-public interface ISerialPort
-{
-    string[] GetPortNames();  // Method to get a list of available serial ports
-    void Open();              // Method to open the serial port
-    void Close();             // Method to close the serial port
-    void WriteLine(string text); // Method to write a line of text to the serial port
-    string ReadLine();        // Method to read a line of text from the serial port
-    int BytesToRead { get; }  // Property to get the number of bytes available to read from the serial port
-}
-
-// Real implementation of the ISerialPort interface, interacting with the actual SerialPort class
-public class RealSerialPort : ISerialPort
-{
-    private SerialPort _serialPort;  // Real SerialPort object
-
-    // Constructor initializes the RealSerialPort with the specified port name
-    public RealSerialPort(string portName)
-    {
-        _serialPort = new SerialPort(portName);
-    }
-
-    // Get a list of available serial ports
-    public string[] GetPortNames()
-    {
-        return SerialPort.GetPortNames();
-    }
-
-    // Open the serial port
-    public void Open() => _serialPort.Open();
-
-    // Close the serial port
-    public void Close() => _serialPort.Close();
-
-    // Write a line of text to the serial port
-    public void WriteLine(string text) => _serialPort.WriteLine(text);
-
-    // Read a line of text from the serial port
-    public string ReadLine() => _serialPort.ReadLine();
-
-    // Get the number of bytes available to read from the serial port
-    public int BytesToRead => _serialPort.BytesToRead;
-}
-
-// Form1 class, which will use the ISerialPort interface to find Arduino connected to a serial port
-public class Form1
-{
-    private ISerialPort serialPort;  // Reference to the ISerialPort interface
-
-    // Constructor to inject the ISerialPort dependency
-    public Form1(ISerialPort serialPort)
-    {
-        this.serialPort = serialPort;  // Assign the injected serialPort to the class field
-    }
-
-    // Method to find the Arduino by checking each available port
-    public string FindArduinoPort()
-    {
-        string[] ports = serialPort.GetPortNames();  // Get a list of available serial ports
-        foreach (string port in ports)
-        {
-            try
-            {
-                serialPort.Open();  // Try to open the serial port
-                serialPort.WriteLine("Arduino?");  // Send a test message to the device
-                Thread.Sleep(1000);  // Wait for a response from the device
-
-                if (serialPort.BytesToRead > 0)  // Check if there's any data available to read
-                {
-                    string response = serialPort.ReadLine().Trim();  // Read the response
-                    if (response == "Yes")  // If the response is "Yes", it's an Arduino
-                    {
-                        serialPort.Close();  // Close the serial port
-                        return port;  // Return the port where Arduino was found
-                    }
-                }
-                serialPort.Close();  // Close the serial port if no response
-            }
-            catch
-            {
-                // Ignore any exceptions (e.g., if the port cannot be opened)
-            }
-        }
-        return null;  // Return null if no Arduino was found
-    }
-}
-
+using NUnit.Framework;
 
 namespace TicTacToeTests
 {
-    public class Form1Tests
+    [TestFixture]
+    public class TicTacToeTests
     {
-        private Mock<ISerialPort> mockSerialPort;
-        private Form1 form;
 
-        public Form1Tests()
+        private SerialPort serialPort = new SerialPort(); 
+        public TicTacToeTests() { }
+
+        [SetUp]
+        public void Setup()
         {
-            mockSerialPort = new Mock<ISerialPort>();
-            form = new Form1(mockSerialPort.Object); // Initialize form with mocked serial port
+            string port = Environment.GetEnvironmentVariable("SERIAL_PORT") ?? "COM5";
+            int baudRate = int.TryParse(Environment.GetEnvironmentVariable("BAUD_RATE"), out int br) ? br : 9600;
+
+            serialPort = new SerialPort(port, baudRate);
+            serialPort.Open();
+            Thread.Sleep(500); 
         }
 
-        // Test 1: FindArduinoPort should return a valid port when Arduino is found
-        [Fact]
-        public void FindArduinoPort_ShouldReturnPort_WhenArduinoIsFound()
+
+
+        [TearDown]
+        public void TearDown()
         {
-            // Arrange: Set up the mock to simulate a response from Arduino on COM3
-            mockSerialPort.Setup(sp => sp.GetPortNames()).Returns(new[] { "COM3" });
-            mockSerialPort.Setup(sp => sp.Open()).Verifiable();
-            mockSerialPort.Setup(sp => sp.WriteLine(It.IsAny<string>())).Verifiable();
-            mockSerialPort.Setup(sp => sp.ReadLine()).Returns("Yes"); // Simulate Arduino response
-            mockSerialPort.Setup(sp => sp.BytesToRead).Returns(1);
-
-            // Act: Call FindArduinoPort method
-            string port = form.FindArduinoPort();
-
-            // Assert: Verify that the correct port was returned
-            Assert.Equal("COM3", port);
-            mockSerialPort.Verify(sp => sp.Open(), Times.Once); // Verify Open was called
-            mockSerialPort.Verify(sp => sp.WriteLine(It.IsAny<string>()), Times.Once);
-            mockSerialPort.Verify(sp => sp.Close(), Times.Once); // Verify Close was called
+            if (serialPort.IsOpen)
+            {
+                serialPort.Close();
+            }
         }
 
-        // Test 2: FindArduinoPort should return null when no Arduino is found
-        [Fact]
-        public void FindArduinoPort_ShouldReturnNull_WhenNoArduinoIsFound()
+        [Test]
+        public void Test_SaveMessage()
         {
-            // Arrange: Set up mock to simulate no response from any port
-            mockSerialPort.Setup(sp => sp.GetPortNames()).Returns(new[] { "COM3", "COM4" });
-            mockSerialPort.Setup(sp => sp.Open()).Verifiable();
-            mockSerialPort.Setup(sp => sp.WriteLine(It.IsAny<string>())).Verifiable();
-            mockSerialPort.Setup(sp => sp.ReadLine()).Returns(""); // Simulate no response from Arduino
-            mockSerialPort.Setup(sp => sp.BytesToRead).Returns(0);
-
-            // Act: Call FindArduinoPort method
-            string port = form.FindArduinoPort();
-
-            // Assert: Verify that no port was found
-            Assert.Null(port);
-            mockSerialPort.Verify(sp => sp.Open(), Times.Exactly(2)); // Open called for both ports
-            mockSerialPort.Verify(sp => sp.WriteLine(It.IsAny<string>()), Times.Exactly(2));
-            mockSerialPort.Verify(sp => sp.Close(), Times.Exactly(2)); // Close called for both ports
+            SendCommand("save HelloWorld");
+            string response = ReadResponse();
+            Assert.That(response, Is.EqualTo("saved"), "The message was not saved correctly");
         }
 
-       
-        
-      
+        [Test]
+        public void Test_LoadSavedMessage()
+        {
+            SendCommand("save HelloWorld");
+            ReadResponse(); 
+            SendCommand("load");
+            string response = ReadResponse();
+            Assert.That(response, Is.EqualTo("HelloWorld"), "Invalid saved message");
+        }
+
+        [Test]
+        public void Test_LoadWithoutSave()
+        {
+            SendCommand("save ");
+            ReadResponse(); 
+            SendCommand("load");
+            string response = ReadResponse();
+            Assert.That(response, Is.EqualTo("no_saved_data"), "Should be 'no_saved_data'");
+        }
+        [Test]
+        public void Test_InvalidCommand()
+        {
+            SendCommand("invalid_command");
+
+            string response = ReadResponse();
+
+            Assert.That(response, Is.Not.Null, "The answer must not be empty.");
+        }
+
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(5)]
+        [TestCase(6)]
+        [TestCase(7)]
+        [TestCase(8)]
+        [TestCase(9)]
+        public void Test_ProcessManualMove(int button)
+        {
+            string message = $"mm {button} X 1_1_1_1_1_1_1_1_1";
+            SendCommand(message);
+            string response = ReadResponse();
+            Assert.That(response, Is.EqualTo($"confirm {button} O"));
+        }
+
+
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(5)]
+        [TestCase(6)]
+        [TestCase(7)]
+        [TestCase(8)]
+        [TestCase(9)]
+        public void Test_AutomatedMove(int button)
+        {
+            string message = $"ma {button} X 1_1_1_1_1_1_1_1_1";
+            SendCommand(message);
+
+            string response = ReadResponse();
+
+            Assert.That(response, Is.EqualTo($"confirm {button} O 2 X").Or.EqualTo($"confirm {button} O 3 X").Or.EqualTo($"confirm {button} O 4 X").Or.EqualTo($"confirm {button} O 5 X").Or.EqualTo($"confirm {button} O 6 X").Or.EqualTo($"confirm {button} O 7 X").Or.EqualTo($"confirm {button} O 8 X").Or.EqualTo($"confirm {button} O 9 X").Or.EqualTo($"confirm {button} O 1 X"));
+
+        }
+
+        [Test]
+        public void Test_AutomatedMoves()
+        {
+            string message = "aar X 1_1_1_1_1_1_1_1_1";
+            SendCommand(message);
+
+            string response = ReadResponse();
+
+            Assert.That(response, Is.Not.Null);
+        }
+
+        [Test]
+        public void Test_WinningStrategy()
+        {
+            string message = "aaws X X_1_1_X_1_1_1_1_1";
+            SendCommand(message);
+
+            string response = ReadResponse();
+
+            Assert.That(response, Is.Not.Null);
+        }
+        [Test]
+        public void Test_UnknownCommand()
+        {
+            SendCommand("unknown command");
+            string response = ReadResponse();
+            Assert.That(response, Is.Empty, "The response to an unknown command must be empty");
+        }
+
+        private void SendCommand(string command)
+        {
+            Console.WriteLine($"Send command: {command}");
+            serialPort.WriteLine(command);
+            Thread.Sleep(500); 
+        }
+
+        private string ReadResponse()
+        {
+            string response = "";
+            int timeout = 500; 
+            int elapsedTime = 0;
+
+            while (elapsedTime < timeout)
+            {
+                if (serialPort.BytesToRead > 0)
+                {
+                    response += serialPort.ReadExisting();
+                    break;
+                }
+                Thread.Sleep(50);
+                elapsedTime += 50;
+            }
+
+            Console.WriteLine($"Response: {response.Trim()}");
+            return response.Trim();
+        }
     }
 }

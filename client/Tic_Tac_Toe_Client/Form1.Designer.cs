@@ -317,29 +317,29 @@
         }
 
         #endregion
-        private System.Windows.Forms.ComboBox comboBox1;
+        public System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox comboBox2;
+        public System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem gameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem NewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem LoadToolStripMenuItem;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button button9;
-        private System.Windows.Forms.Label label3;
+        public System.Windows.Forms.Button button1;
+        public System.Windows.Forms.Button button2;
+        public System.Windows.Forms.Button button3;
+        public System.Windows.Forms.Button button4;
+        public System.Windows.Forms.Button button5;
+        public System.Windows.Forms.Button button6;
+        public System.Windows.Forms.Button button7;
+        public System.Windows.Forms.Button button8;
+        public System.Windows.Forms.Button button9;
+        public System.Windows.Forms.Label label3;
         private System.Windows.Forms.ToolStripMenuItem manVsManToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem manVsAIToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aIVsAIToolStripMenuItem;
-        private System.Windows.Forms.Label label4;
+        public System.Windows.Forms.Label label4;
         private System.Windows.Forms.ToolStripMenuItem randomMoveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem winStrategyToolStripMenuItem;
     }

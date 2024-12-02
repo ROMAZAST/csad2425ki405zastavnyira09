@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - develop
-      - feature/develop/task4
+      - feature/develop/task5
   pull_request:
     branches:
       - develop
 
 jobs:
-  build:
+   build:
     runs-on: windows-latest
 
     steps:
@@ -35,17 +35,6 @@ jobs:
 
       - name: Build solution
         run: ci/Build.bat
-        
-      - name: Run tests
-        run: dotnet test client/Tic_Tac_Toe_Client.sln --configuration Release --verbosity normal --logger "trx;LogFileName=test_results.trx"
-      
-      - name: Publish test reports as artifacts
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: client\TicTacToeTests\TestResults\test_results.trx
-          if-no-files-found: ignore
 
       - name: Publish build artifacts
         if: success()
@@ -53,4 +42,26 @@ jobs:
         with:
           name: build-artifacts
           path: client/Tic_Tac_Toe_Client/bin/x86/Release/
+          if-no-files-found: ignore
+   test:
+    runs-on: windows-latest
+    needs: build  
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.403
+
+      - name: Run custom batch tests
+        run: ci\Tests.bat 
+
+      - name: Publish test reports as artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: client\GUI_TTT_Tests\TestResults\test_results.trx
           if-no-files-found: ignore

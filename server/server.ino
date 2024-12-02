@@ -22,10 +22,20 @@ void loop() {
     message.trim();  // Remove any leading or trailing whitespace
     
     // If the message starts with "save", store it as savedMessage
-    if (message.startsWith("save ")) {
-      savedMessage = message.substring(5); 
-      Serial.println("saved");  // Send confirmation that the message has been saved
-    } 
+   if (message.startsWith("save ")|| message == "save") {
+    String content = message.substring(5);  
+    
+    if (content.length() == 0) { 
+        savedMessage = "";
+        Serial.println("no_saved_data");  
+    } else {
+        savedMessage = content;
+        Serial.println("saved");  // Send confirmation that the message has been saved
+    }
+
+
+}
+
     // If the message is "load", send the saved message or "no_saved_data" if none exists
     else if (message.startsWith("load")) {
       if (savedMessage != "") {
